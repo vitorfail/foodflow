@@ -16,6 +16,7 @@ export default function Home() {
   const [data_person2, setData_person2] = useState<string>("");
   const [dateRange, setDateRange] = useState<string>('') // Estado para controlar o range selecionado
   const [queryDates, setQueryDates] = useState<{ startDate?: string; endDate?: string }>({})
+  const [loja, setLoja] = useState<number>(1)
 
 
   //Para debug
@@ -26,14 +27,15 @@ export default function Home() {
 }, [data_person1,data_person2])
 
   // UseQuery deve ficar no nível do componente, não dentro de funções
-  const { data, isLoading, error } = api.ticket.getAverageTicketByStoreAndDate.useQuery({
+  const { data:ticketData, isLoading, error } = api.ticket.getAverageTicketByStoreAndDate.useQuery({
     startDate: queryDates.startDate!,
     endDate: queryDates.endDate!,
+    loja_id:loja
   }, {
     enabled: !!queryDates.startDate && !!queryDates.endDate, // Só executa quando as datas estão definidas
   })
-  console.log(data)
-  const ticket = data?.[0]?.ticket_medio ?? 0
+  const{data:pegarLojas} = api.lojas.getStores.useQuery()
+  const ticket = ticketData?.[0]?.ticket_medio ?? 0
   const formatarDataDB = (date: Date): string => {
       const ano = date.getFullYear();
       const mes = String(date.getMonth() + 1).padStart(2, '0');
@@ -108,7 +110,11 @@ export default function Home() {
       setData2={setData_person2}
       calendario={calendario}
       setCalendario={setCalendario}
-      onTicketMedioChange={ticektMedioChange} />
+      onTicketMedioChange={ticektMedioChange}
+      lojas={pegarLojas|| []}
+      Store={loja} 
+      setLoja={setLoja}/>
+
       
       <main className="max-w-7xl mx-auto px-4 py-6">
         {/* Métricas Rápidas */}

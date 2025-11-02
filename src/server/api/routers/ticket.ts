@@ -14,10 +14,11 @@ export const tickeMedio = createTRPCRouter({
       z.object({
         startDate: z.string().optional(),
         endDate: z.string().optional(),
+        loja_id: z.number().optional(),
       })
     )
     .query(async ({ ctx, input }) => {
-      const { startDate, endDate } = input;
+      const { startDate, endDate,loja_id } = input;
 
       const result = await ctx.db.$queryRawUnsafe<TicketMedioRow[]>(`
         SELECT 
@@ -29,7 +30,9 @@ export const tickeMedio = createTRPCRouter({
         JOIN stores st ON st.id = s.store_id
         WHERE s.sale_status_desc NOT ILIKE '%cancel%'
           ${startDate ? `AND s.created_at >= '${startDate}'` : ""}
-          ${endDate ? `AND s.created_at <= '${endDate}'` : ""}
+          ${endDate ? `AND s.created_at <= '${endDate}'` : ""} ${loja_id ? 
+            `AND s.store_id = ${loja_id}` : 
+            ""}
         GROUP BY s.store_id, st.name, DATE(s.created_at)
         ORDER BY sale_date DESC, store_name;
       `);

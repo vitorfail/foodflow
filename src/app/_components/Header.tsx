@@ -2,15 +2,23 @@
 
 import { useEffect, useState } from "react";
 
+type LojasStore = {
+  store_id: number;
+  store_name: string;
+};
+
 type HeaderProps = {
   consultaPerso?:(startDate?: string, endDate?: string) => boolean;
   onTicketMedioChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   calendario: boolean;
   setData1: React.Dispatch<React.SetStateAction<string>>;
-  setData2: React.Dispatch<React.SetStateAction<string>>;                               // ← Recebe o valor
+  setData2: React.Dispatch<React.SetStateAction<string>>;
+  Store:number;
+  setLoja: React.Dispatch<React.SetStateAction<number>>;                              
   setCalendario: React.Dispatch<React.SetStateAction<boolean>>;
+  lojas:LojasStore[]
 };
-export function Header({onTicketMedioChange, setData1, setData2, calendario, setCalendario, consultaPerso}: HeaderProps) {
+export function Header({onTicketMedioChange, setData1, setData2, calendario, setCalendario, consultaPerso,lojas,Store,setLoja}: HeaderProps) {
   //Dias do calendário
   const [dia_calendario1, setdiacalendario1] = useState<string>("");
   const [dia_calendario2, setdiacalendario2] = useState<string>("");
@@ -160,7 +168,8 @@ const aplicar = () => {
       array_anos.push(i)
     }
     setAnos(array_anos)
-    mes_formatacao("2025", "08",1);
+    mes_formatacao("2025", "11",1);
+    mes_formatacao("2025", "11",2);
   }, []); 
   return (
     <header className="bg-white shadow-sm border-b relative">
@@ -169,7 +178,7 @@ const aplicar = () => {
           <div className="w-fit h-fit ">
             <div className="bg-white rounded-lg shadow-md p-6 h-[380px] w-[350px]">
               <div className="w-full flex justify-between">
-                  <select onChange={(e) => mes_formatacao(ano_index1, e.target.value,1)}>
+                  <select value={mes_index1} onChange={(e) => mes_formatacao(ano_index1, e.target.value,1)}>
                     <option value={"01"}>Janeiro</option>
                     <option value={"02"}>Fevereiro</option>
                     <option value={"03"}>Março</option>
@@ -226,7 +235,7 @@ const aplicar = () => {
           <div className="w-fit h-fit ">
             <div className="bg-white rounded-lg shadow-md p-6 h-[380px] w-[350px]">
               <div className="w-full flex justify-between">
-                  <select onChange={(e) => mes_formatacao(ano_index2, e.target.value,2)}>
+                  <select value={mes_index2} onChange={(e) => mes_formatacao(ano_index2, e.target.value,2)}>
                     <option value={"01"}>Janeiro</option>
                     <option value={"02"}>Fevereiro</option>
                     <option value={"03"}>Março</option>
@@ -270,7 +279,7 @@ const aplicar = () => {
                   onClick={(e) => {switchIntervalo(String(((index + 1)+"-B")))}}
                     className={`aspect-square rounded-lg border border-gray-200 flex items-center justify-center cursor-pointer transition-colors
                     ${
-                      dia_calendario1 === String(((index + 1)+"-B")) || dia_calendario2 === String((index + 1+"-B"))
+                      dia_calendario2 === String(((index + 1)+"-B")) || dia_calendario2 === String((index + 1+"-B"))
                         ? "bg-blue-500 text-white border-blue-500" // Clicado
                         : "bg-gray-50 hover:bg-blue-50" // Normal
                   }`}>
@@ -302,13 +311,13 @@ const aplicar = () => {
               <option value={"mes"}>Este mês</option>
               <option value={"person"}>Personalizado</option>
             </select>
-            
-            <select className="border rounded-lg px-3 py-2 text-sm">
-              <option>Todas as lojas</option>
-              <option>Loja Centro</option>
-              <option>Loja Shopping</option>
+            <select value={Store} onChange={(e) => setLoja(parseInt(e.target.value))} className="border rounded-lg px-3 py-2 text-sm">
+              {
+                lojas.map((item, index) => (
+                  <option key={index} value={item.store_id}>{item.store_name}</option>
+                ))
+              }
             </select>
-            
             <button className="bg-orange-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-orange-600 transition-colors">
               + Novo Dashboard
             </button>

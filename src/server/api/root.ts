@@ -1,5 +1,6 @@
 import { postRouter } from "~/server/api/routers/post";
 import { tickeMedio } from "~/server/api/routers/ticket";
+import { lojasRouter } from "~/server/api/routers/lojas";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 
 /**
@@ -9,7 +10,8 @@ import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
  */
 export const appRouter = createTRPCRouter({
   post: postRouter,
-  ticket:tickeMedio
+  ticket:tickeMedio,
+  lojas:lojasRouter
 });
 
 // export type definition of API
