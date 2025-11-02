@@ -7,13 +7,23 @@ import { Widget } from './_components/Widget'
 import { RevenueChart } from './_components/charts/RevenueChart'
 import { PeakHoursChart } from './_components/charts/PeakHoursChart'
 import { api } from "~/trpc/react"
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 
 export default function Home() {
-  const [calendario, setCalendario] = useState(true);
+  const [calendario, setCalendario] = useState(false);
+  const [data_person1, setData_person1] = useState<string>("");
+  const [data_person2, setData_person2] = useState<string>("");
   const [dateRange, setDateRange] = useState<string>('') // Estado para controlar o range selecionado
   const [queryDates, setQueryDates] = useState<{ startDate?: string; endDate?: string }>({})
+
+
+  //Para debug
+  useEffect(() => {
+  console.log("Data1 atualizada:", data_person1)
+    console.log("Data2 atualizada:", data_person2)
+
+}, [data_person1,data_person2])
 
   // UseQuery deve ficar no nível do componente, não dentro de funções
   const { data, isLoading, error } = api.ticket.getAverageTicketByStoreAndDate.useQuery({
@@ -22,7 +32,7 @@ export default function Home() {
   }, {
     enabled: !!queryDates.startDate && !!queryDates.endDate, // Só executa quando as datas estão definidas
   })
-
+  console.log(data)
   const ticket = data?.[0]?.ticket_medio ?? 0
   const formatarDataDB = (date: Date): string => {
       const ano = date.getFullYear();
@@ -30,7 +40,12 @@ export default function Home() {
       const dia = String(date.getDate()).padStart(2, '0');
       return `${ano}-${mes}-${dia}`;
   };
+  const consulta_personalizada = (startDate?: string, endDate?: string) =>{
+    setQueryDates({ startDate, endDate })
+    console.log("Buscando ticket médio:", { startDate, endDate })
 
+    return true
+  }
   const ticektMedioChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedValue = event.target.value
     setDateRange(selectedValue) // Atualiza o estado do range
@@ -69,13 +84,7 @@ export default function Home() {
       console.log("Buscando ticket médio:", { startDate, endDate })    
     }
     if(selectedValue === "person"){
-      const hoje = new Date()
-      const primeiroDiaMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1)
-
-      startDate = formatarDataDB(primeiroDiaMes)
-      endDate = formatarDataDB(hoje)
-      setQueryDates({ startDate, endDate })
-      console.log("Buscando ticket médio:", { startDate, endDate })    
+      setCalendario(true)    
     }
 
     // Atualiza o estado para disparar a query
@@ -94,6 +103,9 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header
+      consultaPerso={consulta_personalizada}
+      setData1={setData_person1}
+      setData2={setData_person2}
       calendario={calendario}
       setCalendario={setCalendario}
       onTicketMedioChange={ticektMedioChange} />
