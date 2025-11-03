@@ -11,9 +11,12 @@ export const lojasRouter = createTRPCRouter({
     .query(async ({ ctx }) => {
       const result = await ctx.db.$queryRawUnsafe<StoreRow[]>(`
         SELECT 
-          id,
-          name
-        FROM stores;
+          s.id,
+          s.name
+        FROM stores s
+        INNER JOIN sales sa ON s.id = sa.store_id
+        GROUP BY s.id, s.name, s.city, s.state
+        ORDER BY s.id DESC, s.name;
       `);
             
       // Retorna diretamente o resultado pois já tem id e name

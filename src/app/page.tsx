@@ -34,8 +34,19 @@ export default function Home() {
   }, {
     enabled: !!queryDates.startDate && !!queryDates.endDate, // Só executa quando as datas estão definidas
   })
+  const { data:produtos_complain, isLoading:isloading_produtos, error:error_produtos } = api.produtos_complain.getPrdutosComplain.useQuery({
+    startDate: queryDates.startDate!,
+    endDate: queryDates.endDate!,
+    loja_id:loja
+  }, {
+    enabled: !!queryDates.startDate && !!queryDates.endDate, // Só executa quando as datas estão definidas
+  })
   const{data:pegarLojas} = api.lojas.getStores.useQuery()
   const ticket = ticketData?.[0]?.ticket_medio ?? 0
+  const produto_mais_vendidos = produtos_complain?.[0]?.produto?? ""
+  const organizar_produtos = produtos_complain?.sort((a, b) => 
+      Number(b.total_vendas) - Number(a.total_vendas),
+    );
   const formatarDataDB = (date: Date): string => {
       const ano = date.getFullYear();
       const mes = String(date.getMonth() + 1).padStart(2, '0');
@@ -125,11 +136,7 @@ export default function Home() {
             subtitle="vs ontem"
             trend={{ value: "↑ 12%", isPositive: true }}
           />
-          <MetricCard
-            title="Pedidos Ativos"
-            value="24"
-            subtitle="5 delivery • 19 balcão"
-          />
+
           <MetricCard
             title="Ticket Médio"
             value={"R$"+ticket}
@@ -137,8 +144,13 @@ export default function Home() {
           />
           <MetricCard
             title="Produto Top"
-            value="Pizza Margherita"
-            subtitle="48 vendas hoje"
+            value={produto_mais_vendidos||""}
+            subtitle={String(produtos_complain?.[0]?.quantidade_total?? 0)+ " Vendidas no período"}
+          />
+          <MetricCard
+            title="Produto Rentável"
+            value={organizar_produtos?.[0]?.produto||""}
+            subtitle={String(organizar_produtos?.[0]?.total_vendas?? 0)+ " Receita no período"}
           />
         </div>
 
