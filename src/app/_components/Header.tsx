@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo} from "react";
+import { useFilter } from "../context/filterContext";
 
 type LojasStore = {
   store_id: number;
@@ -8,17 +9,15 @@ type LojasStore = {
 };
 
 type HeaderProps = {
-  consultaPerso?:(startDate?: string, endDate?: string) => boolean;
-  onTicketMedioChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   calendario: boolean;
-  setData1: React.Dispatch<React.SetStateAction<string>>;
-  setData2: React.Dispatch<React.SetStateAction<string>>;
   Store:number;
   setLoja: React.Dispatch<React.SetStateAction<number>>;                              
   setCalendario: React.Dispatch<React.SetStateAction<boolean>>;
   lojas:LojasStore[]
 };
-export function Header({onTicketMedioChange, setData1, setData2, calendario, setCalendario, consultaPerso,lojas,Store,setLoja}: HeaderProps) {
+export function Header({ calendario, setCalendario,lojas,Store,setLoja}: HeaderProps) {
+  //Context
+  const { startDate, endDate, loja_id, setStartDate, setEndDate, setLojaId,formatarData } = useFilter()
   //Dias do calendário
   const [dia_calendario1, setdiacalendario1] = useState<string>("");
   const [dia_calendario2, setdiacalendario2] = useState<string>("");
@@ -40,33 +39,44 @@ export function Header({onTicketMedioChange, setData1, setData2, calendario, set
   //Ordem dos dias do calendário 2
   const [demais_dias_index2, setdemais_dias_index2] = useState(31)
   const [dias_do_mes2,setDias_do_mes2] = useState(1)
-    const mes_formatacao = (ano: string, mes: string, lado:number) => {
-      const data = new Date(parseInt(ano), parseInt(mes) - 1, 1);
-      if(lado==1){
-        setano_index1(ano)
-        var checar_dias =  new Date(parseInt(ano), parseInt(mes), 0).getDate();
-        setdia_index1(data.getDay());
-        setdemais_dias_index1(31 - data.getDay());
-        setDias_do_mes1(checar_dias)
-        setdiacalendario1("")
-        setMes_index1(mes)
-        setdiacalendario2("")
-        setIntervalo(false)
-      }
-      else{
-        setano_index2(ano)
-        var checar_dias =  new Date(parseInt(ano), parseInt(mes), 0).getDate();
-        setdia_index2(data.getDay());
-        setdemais_dias_index2(31 - data.getDay());
-        setDias_do_mes2(checar_dias)
-        setdiacalendario1("")
-        setdiacalendario2("")
-        setMes_index2(mes)
-        setIntervalo(false)
 
-      }
-      // Use o valor calculado, não o state
-    };
+
+  const [searchTerm, setSearchTerm] = useState('');
+    // Filtra as lojas baseado no termo de pesquisa
+  const lojasFiltradas = useMemo(() => {
+    if (!searchTerm) return lojas;
+    return lojas.filter(loja => 
+      loja.store_name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [lojas, searchTerm]);
+
+  const mes_formatacao = (ano: string, mes: string, lado:number) => {
+    const data = new Date(parseInt(ano), parseInt(mes) - 1, 1);
+    if(lado==1){
+      setano_index1(ano)
+      var checar_dias =  new Date(parseInt(ano), parseInt(mes), 0).getDate();
+      setdia_index1(data.getDay());
+      setdemais_dias_index1(31 - data.getDay());
+      setDias_do_mes1(checar_dias)
+      setdiacalendario1("")
+      setMes_index1(mes)
+      setdiacalendario2("")
+      setIntervalo(false)
+    }
+    else{
+      setano_index2(ano)
+      var checar_dias =  new Date(parseInt(ano), parseInt(mes), 0).getDate();
+      setdia_index2(data.getDay());
+      setdemais_dias_index2(31 - data.getDay());
+      setDias_do_mes2(checar_dias)
+      setdiacalendario1("")
+      setdiacalendario2("")
+      setMes_index2(mes)
+      setIntervalo(false)
+
+    }
+    // Use o valor calculado, não o state
+  };
   const switchIntervalo = (e:string) =>{
     if(!intervalo && dia_calendario1 == "" && dia_calendario2==""){
       setIntervalo(true)
@@ -80,86 +90,111 @@ export function Header({onTicketMedioChange, setData1, setData2, calendario, set
       setdiacalendario2("")
     }
   }
-const aplicar = () => {
+  const aplicar = () => {
+    let dataFinal1 = ""
+    let dataFinal2 = ""
 
-  
-  let dataFinal1 = ""
-  let dataFinal2 = ""
-
-  if(dia_calendario1.includes("A") && dia_calendario2.includes("A")){
-    var dia_formatado1 = parseInt(dia_calendario1.replace("-A", ""))
-    var dia_formatado2 = parseInt(dia_calendario2.replace("-A", ""))
-    
-    if(dia_formatado1 > dia_formatado2){
-      dataFinal1 = `${ano_index1}-${mes_index1}-${dia_formatado2.toString().padStart(2, '0')}`
-      dataFinal2 = `${ano_index1}-${mes_index1}-${dia_formatado1.toString().padStart(2, '0')}`
-    } else {
-      dataFinal1 = `${ano_index1}-${mes_index1}-${dia_formatado1.toString().padStart(2, '0')}`
-      dataFinal2 = `${ano_index1}-${mes_index1}-${dia_formatado2.toString().padStart(2, '0')}`
-    }
-  } 
-  else if(dia_calendario1.includes("B") && dia_calendario2.includes("B")){
-    var dia_formatado1 = parseInt(dia_calendario1.replace("-B", ""))
-    var dia_formatado2 = parseInt(dia_calendario2.replace("-B", "")) 
-    
-    if(dia_formatado1 > dia_formatado2){
-      dataFinal1 = `${ano_index2}-${mes_index2}-${dia_formatado2.toString().padStart(2, '0')}`
-      dataFinal2 = `${ano_index2}-${mes_index2}-${dia_formatado1.toString().padStart(2, '0')}`
-    } else {
-      dataFinal1 = `${ano_index2}-${mes_index2}-${dia_formatado1.toString().padStart(2, '0')}`
-      dataFinal2 = `${ano_index2}-${mes_index2}-${dia_formatado2.toString().padStart(2, '0')}`
-    }
-  }
-  else {
-    var data_a = ""
-    var data_b = ""
-    
-    if(dia_calendario1.includes("A")){
-      data_a = dia_calendario1.replace("-A", "").padStart(2, '0')
-      data_b = dia_calendario2.replace("-B", "").padStart(2, '0')
+    if(dia_calendario1.includes("A") && dia_calendario2.includes("A")){
+      var dia_formatado1 = parseInt(dia_calendario1.replace("-A", ""))
+      var dia_formatado2 = parseInt(dia_calendario2.replace("-A", ""))
       
-      var data_teste_formato = new Date(`${ano_index1}-${mes_index1}-${data_a}`)
-      var data_teste_formato2 = new Date(`${ano_index2}-${mes_index2}-${data_b}`)
-      
-      if(data_teste_formato < data_teste_formato2){
-        dataFinal1 = `${ano_index1}-${mes_index1}-${data_a}`
-        dataFinal2 = `${ano_index2}-${mes_index2}-${data_b}`
+      if(dia_formatado1 > dia_formatado2){
+        dataFinal1 = `${ano_index1}-${mes_index1}-${dia_formatado2.toString().padStart(2, '0')}`
+        dataFinal2 = `${ano_index1}-${mes_index1}-${dia_formatado1.toString().padStart(2, '0')}`
       } else {
-        dataFinal1 = `${ano_index2}-${mes_index2}-${data_b}`
-        dataFinal2 = `${ano_index1}-${mes_index1}-${data_a}`
+        dataFinal1 = `${ano_index1}-${mes_index1}-${dia_formatado1.toString().padStart(2, '0')}`
+        dataFinal2 = `${ano_index1}-${mes_index1}-${dia_formatado2.toString().padStart(2, '0')}`
       }
-    } else {
-      data_a = dia_calendario2.replace("-A", "").padStart(2, '0')
-      data_b = dia_calendario1.replace("-B", "").padStart(2, '0')
+    } 
+    else if(dia_calendario1.includes("B") && dia_calendario2.includes("B")){
+      var dia_formatado1 = parseInt(dia_calendario1.replace("-B", ""))
+      var dia_formatado2 = parseInt(dia_calendario2.replace("-B", "")) 
       
-      var data_teste_formato = new Date(`${ano_index1}-${mes_index1}-${data_a}`)
-      var data_teste_formato2 = new Date(`${ano_index2}-${mes_index2}-${data_b}`)
-      
-      if(data_teste_formato < data_teste_formato2){
-        dataFinal1 = `${ano_index1}-${mes_index1}-${data_a}`
-        dataFinal2 = `${ano_index2}-${mes_index2}-${data_b}`
+      if(dia_formatado1 > dia_formatado2){
+        dataFinal1 = `${ano_index2}-${mes_index2}-${dia_formatado2.toString().padStart(2, '0')}`
+        dataFinal2 = `${ano_index2}-${mes_index2}-${dia_formatado1.toString().padStart(2, '0')}`
       } else {
-        dataFinal1 = `${ano_index2}-${mes_index2}-${data_b}`
-        dataFinal2 = `${ano_index1}-${mes_index1}-${data_a}`
+        dataFinal1 = `${ano_index2}-${mes_index2}-${dia_formatado1.toString().padStart(2, '0')}`
+        dataFinal2 = `${ano_index2}-${mes_index2}-${dia_formatado2.toString().padStart(2, '0')}`
       }
     }
-  }
-
-  console.log("Datas definidas:", { dataFinal1, dataFinal2 })
-
-  // Primeiro atualiza os estados
-  setData1(dataFinal1)
-  setData2(dataFinal2)
-
-  // Depois executa a consulta (dá um pequeno delay para o estado atualizar)
-  setTimeout(() => {
-    if (consultaPerso) {
-      console.log("Chamando consultaPerso com:", { data1: dataFinal1, data2: dataFinal2 })
-      consultaPerso(dataFinal1, dataFinal2)
+    else {
+      var data_a = ""
+      var data_b = ""
+      
+      if(dia_calendario1.includes("A")){
+        data_a = dia_calendario1.replace("-A", "").padStart(2, '0')
+        data_b = dia_calendario2.replace("-B", "").padStart(2, '0')
+        
+        var data_teste_formato = new Date(`${ano_index1}-${mes_index1}-${data_a}`)
+        var data_teste_formato2 = new Date(`${ano_index2}-${mes_index2}-${data_b}`)
+        
+        if(data_teste_formato < data_teste_formato2){
+          dataFinal1 = `${ano_index1}-${mes_index1}-${data_a}`
+          dataFinal2 = `${ano_index2}-${mes_index2}-${data_b}`
+        } else {
+          dataFinal1 = `${ano_index2}-${mes_index2}-${data_b}`
+          dataFinal2 = `${ano_index1}-${mes_index1}-${data_a}`
+        }
+      } else {
+        data_a = dia_calendario2.replace("-A", "").padStart(2, '0')
+        data_b = dia_calendario1.replace("-B", "").padStart(2, '0')
+        
+        var data_teste_formato = new Date(`${ano_index1}-${mes_index1}-${data_a}`)
+        var data_teste_formato2 = new Date(`${ano_index2}-${mes_index2}-${data_b}`)
+        
+        if(data_teste_formato < data_teste_formato2){
+          dataFinal1 = `${ano_index1}-${mes_index1}-${data_a}`
+          dataFinal2 = `${ano_index2}-${mes_index2}-${data_b}`
+        } else {
+          dataFinal1 = `${ano_index2}-${mes_index2}-${data_b}`
+          dataFinal2 = `${ano_index1}-${mes_index1}-${data_a}`
+        }
+      }
     }
+
+    console.log("Datas definidas:", { dataFinal1, dataFinal2 })
+
+    // Primeiro atualiza os estados
+    setStartDate(dataFinal1)
+    setEndDate(dataFinal2)
     setCalendario(false)
-  }, 100)
-}
+  }
+  const ticektMedioChange = (event:React.ChangeEvent<HTMLSelectElement>) => {
+      const selectedValue = event.target.value
+  
+      let startDate: string | null
+      let endDate: string | null
+  
+      if (selectedValue === '7') {
+        const hoje = new Date()
+        const seteDiasAtras = new Date()
+        seteDiasAtras.setDate(hoje.getDate() - 7)
+  
+        setStartDate(formatarData(seteDiasAtras))
+        setEndDate(formatarData(hoje))
+  
+      }if (selectedValue === "30") {
+        const hoje = new Date()
+        const trintaDiasAtras = new Date()
+        trintaDiasAtras.setDate(hoje.getDate() - 30)
+  
+        setStartDate(formatarData(trintaDiasAtras))
+        setEndDate(formatarData(hoje))
+      } 
+      if(selectedValue === "mes"){
+        const hoje = new Date()
+        const primeiroDiaMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1)
+  
+        setStartDate(formatarData(primeiroDiaMes))
+        setEndDate(formatarData(hoje))
+      }
+      if(selectedValue === "person"){
+        setCalendario(true)    
+      }
+  
+      // Atualiza o estado para disparar a query
+  };
   // Use useEffect para executar apenas uma vez
   useEffect(() => {
     var hoje = new Date().getFullYear()+1;
@@ -305,19 +340,40 @@ const aplicar = () => {
           </div>
           
           <div className="flex items-center space-x-4">
-            <select onChange={onTicketMedioChange} className="border rounded-lg px-3 py-2 text-sm">
-              <option value={7} >Últimos 7 dias</option>
-              <option value={30}>Últimos 30 dias</option>
-              <option value={"mes"}>Este mês</option>
-              <option value={"person"}>Personalizado</option>
+            <select onChange={(e) => ticektMedioChange(e)} className="border rounded-lg px-3 py-2 text-sm">
+              <option value="7" >Últimos 7 dias</option>
+              <option value="30">Últimos 30 dias</option>
+              <option value="mes">Este mês</option>
+              <option value="person">Personalizado</option>
             </select>
-            <select value={Store} onChange={(e) => setLoja(parseInt(e.target.value))} className="border rounded-lg px-3 py-2 text-sm">
-              {
-                lojas.map((item, index) => (
-                  <option key={index} value={item.store_id}>{item.store_name}</option>
-                ))
-              }
-            </select>
+<div className="relative">
+  <input
+    type="text"
+    placeholder="Pesquisar lojas..."
+    value={searchTerm}
+    onChange={(e) => setSearchTerm(e.target.value)}
+    className="border rounded-lg px-3 py-2 text-sm w-full"
+  />
+  
+  {/* Dropdown personalizado */}
+  {searchTerm && (
+    <div className="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-lg mt-1 max-h-60 overflow-y-auto z-10 shadow-lg">
+      {lojasFiltradas.map((item, index) => (
+        <div
+          key={index}
+          onClick={() => {
+            setLoja(item.store_id);
+            setSearchTerm(item.store_name); // Mostra o nome no input
+          }}
+          className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+        >
+          {item.store_name}
+        </div>
+      ))}
+    </div>
+  )}
+</div>
+
             <button className="bg-orange-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-orange-600 transition-colors">
               + Novo Dashboard
             </button>

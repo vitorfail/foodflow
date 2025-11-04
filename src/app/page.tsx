@@ -4,42 +4,130 @@ import { Header } from './_components/Header'
 import { MetricCard } from './_components/MetricCard'
 import { Sidebar } from './_components/Sidebar'
 import { Widget } from './_components/Widget'
-import { RevenueChart } from './_components/charts/RevenueChart'
-import { PeakHoursChart } from './_components/charts/PeakHoursChart'
+import { GraficoColunas } from './_components/charts/GraficoColunas'
+import { HorariosdePico } from './_components/charts/HorariosdePico'
 import { api } from "~/trpc/react"
 import { useEffect, useState } from 'react'
+import { useFilter } from './context/filterContext'
+import React from 'react'
 
 
 export default function Home() {
+  //Context
+  const { startDate, endDate, loja_id, setStartDate, setEndDate, setLojaId } = useFilter()
+
   const [calendario, setCalendario] = useState(false);
-  const [data_person1, setData_person1] = useState<string>("");
-  const [data_person2, setData_person2] = useState<string>("");
-  const [dateRange, setDateRange] = useState<string>('') // Estado para controlar o range selecionado
-  const [queryDates, setQueryDates] = useState<{ startDate?: string; endDate?: string }>({})
   const [loja, setLoja] = useState<number>(1)
 
+  const [isDragOver, setIsDragOver] = useState(false)
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
+  const widgetComponents = {
+    'chart-line': GraficoColunas,
+    'chart-bar': HorariosdePico, 
+    'metric': HorariosdePico,
+    'table': HorariosdePico,
+    'top-products': GraficoColunas, // ou o componente que você quiser
+  }
 
+  const [widgets, setWidgets] = useState([
+    { 
+      id: 1, 
+      type: 'faturamento-canal', 
+      title: "Faturamento por Canal", 
+      component: GraficoColunas 
+    },
+    { 
+      id: 2, 
+      type: 'top-produtos', 
+      title: "Top 5 Produtos", 
+      component: HorariosdePico
+    },
+    { 
+      id: 3, 
+      type: 'horarios-pico', 
+      title: "Horários de Pico", 
+      component: HorariosdePico 
+    },
+    { 
+      id: 4, 
+      type: 'performance-entrega', 
+      title: "Performance de Entrega", 
+      component: HorariosdePico 
+    }
+  ])
+  const getWidgetComponent = (type: string) => {
+    return widgetComponents[type as keyof typeof widgetComponents] || null
+  }
+
+  // Função para obter o título baseado no tipo
+  const getWidgetTitle = (type: string) => {
+    const titles: Record<string, string> = {
+      'chart-line': 'Gráfico de Linha',
+      'chart-bar': 'Gráfico de Barras',
+      'metric': 'Métrica Simples',
+      'table': 'Tabela de Dados',
+      'top-products': 'Top Produtos'
+    }
+    return titles[type] || 'Novo Widget'
+  }
+  const handleDragOver_r = (e: React.DragEvent, index?: number) => {
+    e.preventDefault()
+    setDragOverIndex(index ?? null)
+  }
+
+  const handleDragLeave_r = (e: React.DragEvent) => {
+    e.preventDefault()
+    // Só remove o indicador se o mouse saiu completamente da área do relatório
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+      setDragOverIndex(null)
+    }
+  }
+
+  const handleDrop_r = (e: React.DragEvent, index?: number) => {
+    e.preventDefault()
+    setDragOverIndex(null)
+    
+    const widgetType = e.dataTransfer.getData('widget-type')
+    
+    if (widgetType && typeof index === 'number') {
+      console.log(`Widget ${widgetType} dropped at position: ${index}`)
+      
+      const Component = getWidgetComponent(widgetType)
+      
+      if (Component) {
+        const newWidget = {
+          id: Date.now(),
+          type: widgetType,
+          title: getWidgetTitle(widgetType),
+          component: Component
+        }
+        
+        const newWidgets = [...widgets]
+        newWidgets.splice(index, 0, newWidget)
+        setWidgets(newWidgets)
+        
+        // Chama a callback se existir
+      }
+    }
+  }
   //Para debug
   useEffect(() => {
-  console.log("Data1 atualizada:", data_person1)
-    console.log("Data2 atualizada:", data_person2)
-
-}, [data_person1,data_person2])
+  }, [])
 
   // UseQuery deve ficar no nível do componente, não dentro de funções
   const { data:ticketData, isLoading, error } = api.ticket.getAverageTicketByStoreAndDate.useQuery({
-    startDate: queryDates.startDate!,
-    endDate: queryDates.endDate!,
+    startDate: startDate!,
+    endDate: endDate!,
     loja_id:loja
   }, {
-    enabled: !!queryDates.startDate && !!queryDates.endDate, // Só executa quando as datas estão definidas
+    enabled: !!startDate && !!endDate, // Só executa quando as datas estão definidas
   })
   const { data:produtos_complain, isLoading:isloading_produtos, error:error_produtos } = api.produtos_complain.getPrdutosComplain.useQuery({
-    startDate: queryDates.startDate!,
-    endDate: queryDates.endDate!,
+    startDate: startDate!,
+    endDate: endDate!,
     loja_id:loja
   }, {
-    enabled: !!queryDates.startDate && !!queryDates.endDate, // Só executa quando as datas estão definidas
+    enabled: !!startDate && !!endDate, // Só executa quando as datas estão definidas
   })
   const{data:pegarLojas} = api.lojas.getStores.useQuery()
   const ticket = ticketData?.[0]?.ticket_medio ?? 0
@@ -47,81 +135,12 @@ export default function Home() {
   const organizar_produtos = produtos_complain?.sort((a, b) => 
       Number(b.total_vendas) - Number(a.total_vendas),
     );
-  const formatarDataDB = (date: Date): string => {
-      const ano = date.getFullYear();
-      const mes = String(date.getMonth() + 1).padStart(2, '0');
-      const dia = String(date.getDate()).padStart(2, '0');
-      return `${ano}-${mes}-${dia}`;
-  };
-  const consulta_personalizada = (startDate?: string, endDate?: string) =>{
-    setQueryDates({ startDate, endDate })
-    console.log("Buscando ticket médio:", { startDate, endDate })
-
-    return true
-  }
-  const ticektMedioChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedValue = event.target.value
-    setDateRange(selectedValue) // Atualiza o estado do range
-
-    let startDate: string
-    let endDate: string
-
-    if (selectedValue === '7') {
-      const hoje = new Date()
-      const seteDiasAtras = new Date()
-      seteDiasAtras.setDate(hoje.getDate() - 7)
-
-      startDate = formatarDataDB(seteDiasAtras)
-      endDate = formatarDataDB(hoje)
-      setQueryDates({ startDate, endDate })
-      console.log("Buscando ticket médio:", { startDate, endDate })
-
-    }if (selectedValue === "30") {
-      const hoje = new Date()
-      const trintaDiasAtras = new Date()
-      trintaDiasAtras.setDate(hoje.getDate() - 30)
-
-      startDate = formatarDataDB(trintaDiasAtras)
-      endDate = formatarDataDB(hoje)
-      setQueryDates({ startDate, endDate })
-      console.log("Buscando ticket médio:", { startDate, endDate })
-
-    } 
-    if(selectedValue === "mes"){
-      const hoje = new Date()
-      const primeiroDiaMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1)
-
-      startDate = formatarDataDB(primeiroDiaMes)
-      endDate = formatarDataDB(hoje)
-      setQueryDates({ startDate, endDate })
-      console.log("Buscando ticket médio:", { startDate, endDate })    
-    }
-    if(selectedValue === "person"){
-      setCalendario(true)    
-    }
-
-    // Atualiza o estado para disparar a query
-  };
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    const widgetType = e.dataTransfer.getData('widget-type')
-    console.log('Adicionando widget:', widgetType)
-    // Aqui você implementaria a lógica para adicionar o widget
-  }
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault()
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Header
-      consultaPerso={consulta_personalizada}
-      setData1={setData_person1}
-      setData2={setData_person2}
       calendario={calendario}
       setCalendario={setCalendario}
-      onTicketMedioChange={ticektMedioChange}
       lojas={pegarLojas|| []}
       Store={loja} 
       setLoja={setLoja}/>
@@ -173,72 +192,50 @@ export default function Home() {
               </div>
 
               {/* Grid de Widgets */}
-              <div 
-                className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6"
-                onDrop={handleDrop}
-                onDragOver={handleDragOver}
-              >
-                {/* Widget 1: Faturamento por Canal */}
-                <Widget 
-                  title="Faturamento por Canal" 
-                  subtitle="Comparativo últimos 7 dias"
-                  className="lg:col-span-2"
-                >
-                  <div className="h-64">
-                    <RevenueChart />
-                  </div>
-                </Widget>
-
-                {/* Widget 2: Top 5 Produtos */}
-                <Widget title="Top 5 Produtos" subtitle="Mais vendidos hoje">
-                  <div className="space-y-3">
-                    {[
-                      { name: 'Pizza Margherita', value: 48 },
-                      { name: 'Hamburguer Artesanal', value: 32 },
-                      { name: 'Coca-Cola 2L', value: 28 },
-                      { name: 'Brownie com Sorvete', value: 19 },
-                      { name: 'Salada Caesar', value: 15 },
-                    ].map((item, index) => (
-                      <div key={index} className="flex justify-between items-center">
-                        <span className="text-sm">{index + 1}. {item.name}</span>
-                        <span className="font-semibold">{item.value}</span>
-                      </div>
-                    ))}
-                  </div>
-                </Widget>
-
-                {/* Widget 3: Horários de Pico */}
-                <Widget title="Horários de Pico" subtitle="Média de pedidos por hora">
-                  <div className="h-48">
-                    <PeakHoursChart />
-                  </div>
-                </Widget>
-
-                {/* Widget 4: Performance de Entrega */}
-                <Widget 
-                  title="Performance de Entrega" 
-                  subtitle="Comparativo de plataformas"
-                  className="lg:col-span-2"
-                >
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="text-center p-4 bg-orange-50 rounded-lg">
-                      <div className="text-2xl font-bold text-orange-600">38 min</div>
-                      <div className="text-sm text-gray-600">Tempo Médio</div>
-                      <div className="text-xs text-green-500">↓ 5 min</div>
-                    </div>
-                    <div className="text-center p-4 bg-blue-50 rounded-lg">
-                      <div className="text-2xl font-bold text-blue-600">4.8★</div>
-                      <div className="text-sm text-gray-600">Avaliação iFood</div>
-                      <div className="text-xs text-green-500">↑ 0.2</div>
-                    </div>
-                    <div className="text-center p-4 bg-green-50 rounded-lg">
-                      <div className="text-2xl font-bold text-green-600">94%</div>
-                      <div className="text-sm text-gray-600">Entregas no Prazo</div>
-                      <div className="text-xs text-green-500">↑ 3%</div>
-                    </div>
-                  </div>
-                </Widget>
-              </div>
+<div 
+  id="relatorio"
+  onDragOver={(e) => handleDragOver_r(e)}
+  onDragLeave={handleDragLeave_r}
+  className="grid grid-cols-1 gap-6 relative"
+>
+  {widgets.map((widget, index) => {
+    const WidgetComponent = widget.component
+    
+    return (
+      <React.Fragment key={widget.id}>
+        {/* Indicador de drop entre widgets */}
+        {dragOverIndex === index && (
+          <div className="h-1 bg-orange-500 rounded-full my-2 mx-4 transition-all duration-200" />
+        )}
+        
+        {/* Widget existente */}
+        <div
+          onDragOver={(e) => handleDragOver_r(e, index)}
+          onDrop={(e) => handleDrop_r(e, index)}
+          className={`transition-all duration-200 ${
+            dragOverIndex === index ? 'opacity-50' : ''
+          }`}
+        >
+          <Widget title={widget.title} subtitle="...">
+            <WidgetComponent />
+          </Widget>
+        </div>
+      </React.Fragment>
+    )
+  })}
+  
+  {/* Indicador de drop no final */}
+  {dragOverIndex === widgets.length && (
+    <div className="h-1 bg-orange-500 rounded-full my-2 mx-4 transition-all duration-200" />
+  )}
+  
+  {/* Área vazia para drop no final */}
+  <div
+    onDragOver={(e) => handleDragOver_r(e, widgets.length)}
+    onDrop={(e) => handleDrop_r(e, widgets.length)}
+    className="min-h-20 rounded-lg border-2 border-dashed border-gray-300 transition-all duration-200"
+  />
+</div> 
             </div>
           </div>
         </div>
