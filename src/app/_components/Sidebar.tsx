@@ -4,7 +4,7 @@ const draggableWidgets = [
   { type: 'chart-bar', label: '📊 Gráfico de Coluna' },
   { type: 'chart-line', label: '📈 Gráfico de Barras' },
   { type: 'chart-pizza', label: '🍕 Pizza' },
-  { type: 'table', label: '📋 Tabela de Dados' },
+  { type: 'chart gender', label: '📋 Grafico por Genero' },
   { type: 'top-products', label: '🍕 Top Produtos' },
 ]
 

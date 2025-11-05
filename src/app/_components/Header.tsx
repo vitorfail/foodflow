@@ -42,7 +42,8 @@ export function Header({ calendario, setCalendario,lojas}: HeaderProps) {
 
 
   const [searchTerm, setSearchTerm] = useState('');
-    // Filtra as lojas baseado no termo de pesquisa
+  const [showDropdown, setShowDropdown] = useState(false);
+// Filtra as lojas baseado no termo de pesquisa
   const lojasFiltradas = useMemo(() => {
     if (!searchTerm) return lojas;
     return lojas.filter(loja => 
@@ -352,32 +353,33 @@ export function Header({ calendario, setCalendario,lojas}: HeaderProps) {
                 type="text"
                 placeholder="Pesquisar lojas..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setShowDropdown(true); // Mostra dropdown quando digitar
+                }}
+                onFocus={() => setShowDropdown(true)} 
                 className="border rounded-lg px-3 py-2 text-sm w-full"
               />
               
-              {/* Dropdown personalizado */}
-              {searchTerm && (
-                <div className="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-lg mt-1 max-h-60 overflow-y-auto z-10 shadow-lg">
-                  {lojasFiltradas.map((item, index) => (
-                    <div
-                      key={index}
-                      onClick={() => {
-                        setLojaId(item.store_id);
-                        setSearchTerm(item.store_name); // Mostra o nome no input
-                      }}
-                      className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
-                    >
-                      {item.store_name}
-                    </div>
-                  ))}
-                </div>
-              )}
+              {showDropdown && lojasFiltradas.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-lg mt-1 max-h-60 overflow-y-auto z-10 shadow-lg">
+                    {lojasFiltradas.map((item, index) => (
+                      <div
+                        key={index}
+                        onClick={() => {
+                          setLojaId(item.store_id);
+                          setSearchTerm(item.store_name);
+                          setShowDropdown(false); // Esconde o dropdown
+                        }}
+                        className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                      >
+                        {item.store_name}
+                      </div>
+                    ))}
+                  </div>
+                )}
             </div>
 
-            <button className="bg-orange-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-orange-600 transition-colors">
-              + Novo Dashboard
-            </button>
           </div>
         </div>
       </div>

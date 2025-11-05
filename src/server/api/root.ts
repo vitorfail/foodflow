@@ -5,6 +5,7 @@ import {produtosComplain} from "~/server/api/routers/produto_mais_vendido";
 import { graficodeColunas } from "~/server/api/routers/grafico_Colunas";
 import { horariosfaturamento } from "~/server/api/routers/horario_de_pico";
 import { PagamentosTipos } from "~/server/api/routers/tipo_de_pagamento";
+import { ConsumoporGenero } from "~/server/api/routers/consumo_por_genero";
 
 /**
  * This is the primary router for your server.
@@ -17,7 +18,8 @@ export const appRouter = createTRPCRouter({
   produtos_complain: produtosComplain,
   grafico_de_colunas:graficodeColunas,
   horarios_faturamento: horariosfaturamento,
-  pagamentoTipo: PagamentosTipos
+  pagamentoTipo: PagamentosTipos,
+  ConsumoGenero: ConsumoporGenero
 });
 
 // export type definition of API

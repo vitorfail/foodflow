@@ -1,29 +1,50 @@
-# Create T3 App
+###🚀 Sobre o Projeto
+Como base no que foi requisitado eu eu optei por fazer um MVP. E tendo em vista que tive experiência com o T3 App, eu optei por esse framework. O projeto tem três parttes, o front end em Next.js, o Back end em trpc, e o ORM em prisma. 
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+---
 
-## What's next? How do I make an app with this?
+###😵‍💫Sobre o Problema
+De fato muitos empreendedores tem uma demanda cruscial na questão de vizualização de dados, tenho noção disso pois já trabalhei no setor de estoque de uma grande empresa de varejo da minha região e era um caos(kkkkk). O Fato é que um grando problema que eles enfrentão é a vizualização mais clara para tomada de decisões.
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+---
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+###✨ Inspiração
+Com base nesse problema eu me inpirei em um ferramente tão simples que qualquer pessoa consegue usar já nno primeiro contato: o `dashgo`. O intuito dela é fazer com que você "crafte" os widgets que você vai querer. Me baseei nisso para colocar a feature de arrastar e solvar o kpis e graficos que o gestor desejar.  
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+---
 
-## Learn More
+###🛠️ Stack Tecnológica
+Frontend: Next.js
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+Backend: tRPC
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+ORM: Prisma
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+Database: PostgreSQL
 
-## How do I deploy this?
+Deploy: Render
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+###📋 Funcionalidades
+✅ Sistema de arrastar e soltar para criação de widgets
+
+✅ Interface intuitiva para montagem de dashboards
+
+✅ Visualização de KPIs e gráficos personalizáveis
+
+⏳ Futuras melhorias: Filtros e seleção de dados nos widgets
+
+###🗃️ Banco de Dados
+Devido ao fato do banco de dados tem em torno de 758mb eu tive que procurar bem para achar um DB com uma licença free para suportar ele para o deploy web. Por isso optei eplo render.
+
+###🔧 Configuração
+No email onde mandei o link desse portifólio também mandei o arquivo .env. É só olocar ele na raiz do projeto. 
+
+###🚧 Limitações e Próximos Passos
+⚠️ Performance limitada devido a restrições da versão free do Render
+
+🔄 Funcionalidade de filtros nos widgets não implementada
+
+📈 Tentei otimizar as querys para serem mais rápidas, mas para isso precisava colocar indices na tabela de sales(principalmente) e nas demais. Mas infelizmente quando tentei fazer isso acabei esbarrando no limite de espaço do plano free. 
+
+###🙏 Agradecimentos
+ O projeto ficou bem aquém do que eu queria pois não consegui colocar as features nos Widgets permitindo que o usuário escolhesse quais dados quer vizualizar. Sei que passei (e muito) do prazo desejado, mas devidido a problemas pessoais esse foi o melhor e mais honesto que consegui entregar. De qualquer forma Obrigrado pela oportunidade

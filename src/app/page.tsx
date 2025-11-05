@@ -7,6 +7,7 @@ import { Widget } from './_components/Widget'
 import { GraficoColunas } from './_components/charts/GraficoColunas'
 import { HorariosdePico } from './_components/charts/HorariosdePico'
 import { GraficoPizza } from './_components/charts/GraficoPizza'
+import { GraficoColunasGenero } from './_components/charts/GraficoColunasGenero'
 import { api } from "~/trpc/react"
 import { useEffect, useState } from 'react'
 import { useFilter } from './context/filterContext'
@@ -26,7 +27,7 @@ export default function Home() {
     'chart-bar': GraficoColunas,
     'chart-line': HorariosdePico, 
     'chart-pizza': GraficoPizza,
-    'table': HorariosdePico,
+    'chart gender': GraficoColunasGenero,
     'top-products': GraficoColunas, // ou o componente que você quiser
   }
 
@@ -42,19 +43,8 @@ export default function Home() {
       type: 'top-produtos', 
       title: "Top 5 Produtos", 
       component: HorariosdePico
-    },
-    { 
-      id: 3, 
-      type: 'horarios-pico', 
-      title: "Horários de Pico", 
-      component: HorariosdePico 
-    },
-    { 
-      id: 4, 
-      type: 'performance-entrega', 
-      title: "Performance de Entrega", 
-      component: HorariosdePico 
     }
+
   ])
   const getWidgetComponent = (type: string) => {
     return widgetComponents[type as keyof typeof widgetComponents] || null
@@ -151,25 +141,25 @@ export default function Home() {
         {/* Métricas Rápidas */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <MetricCard
-            title="Faturamento Hoje"
-            value="R$ 8.247"
-            subtitle="vs ontem"
-            trend={{ value: "↑ 12%", isPositive: true }}
+            title="Olá"
+            value=""
+            subtitle=""
+            trend={{ value: "", isPositive: true }}
           />
 
           <MetricCard
             title="Ticket Médio"
-            value={"R$"+ticket}
+            value={ticket? "R$"+ticket: "Carregando..."}
             subtitle="+R$ 2,30 vs semana passada"
           />
           <MetricCard
             title="Produto Top"
-            value={produto_mais_vendidos||""}
+            value={produto_mais_vendidos||"Carregando..."}
             subtitle={String(produtos_complain?.[0]?.quantidade_total?? 0)+ " Vendidas no período"}
           />
           <MetricCard
             title="Produto Rentável"
-            value={organizar_produtos?.[0]?.produto||""}
+            value={organizar_produtos?.[0]?.produto||"Carregando..."}
             subtitle={String(organizar_produtos?.[0]?.total_vendas?? 0)+ " Receita no período"}
           />
         </div>

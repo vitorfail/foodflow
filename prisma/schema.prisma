@@ -225,6 +225,7 @@ model Sale {
   deliveryAddresses DeliveryAddress[]
 
   @@map("sales")
+  
 }
 
 model ProductSale {

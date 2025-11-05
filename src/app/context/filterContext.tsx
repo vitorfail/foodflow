@@ -91,7 +91,7 @@ export function FilterProvider({ children }: FilterProviderProps) {
   const clearFilters = () => {
     setStartDate(defaultStartDate)
     setEndDate(defaultEndDate)
-    setLojaId(null)
+    setLojaId(62)
   }
 
   return (
