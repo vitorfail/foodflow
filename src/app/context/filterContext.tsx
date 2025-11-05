@@ -86,12 +86,12 @@ export function FilterProvider({ children }: FilterProviderProps) {
 
   const [startDate, setStartDate] = useState<string | null>(defaultStartDate)
   const [endDate, setEndDate] = useState<string | null>(defaultEndDate)
-  const [loja_id, setLojaId] = useState<number | null>(62)
+  const [loja_id, setLojaId] = useState<number | null>(null)
 
   const clearFilters = () => {
     setStartDate(defaultStartDate)
     setEndDate(defaultEndDate)
-    setLojaId(62)
+    setLojaId(null)
   }
 
   return (

@@ -6,6 +6,7 @@ import { Sidebar } from './_components/Sidebar'
 import { Widget } from './_components/Widget'
 import { GraficoColunas } from './_components/charts/GraficoColunas'
 import { HorariosdePico } from './_components/charts/HorariosdePico'
+import { GraficoPizza } from './_components/charts/GraficoPizza'
 import { api } from "~/trpc/react"
 import { useEffect, useState } from 'react'
 import { useFilter } from './context/filterContext'
@@ -22,9 +23,9 @@ export default function Home() {
   const [isDragOver, setIsDragOver] = useState(false)
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
   const widgetComponents = {
-    'chart-line': GraficoColunas,
-    'chart-bar': HorariosdePico, 
-    'metric': HorariosdePico,
+    'chart-bar': GraficoColunas,
+    'chart-line': HorariosdePico, 
+    'chart-pizza': GraficoPizza,
     'table': HorariosdePico,
     'top-products': GraficoColunas, // ou o componente que você quiser
   }
@@ -62,9 +63,9 @@ export default function Home() {
   // Função para obter o título baseado no tipo
   const getWidgetTitle = (type: string) => {
     const titles: Record<string, string> = {
-      'chart-line': 'Gráfico de Linha',
-      'chart-bar': 'Gráfico de Barras',
-      'metric': 'Métrica Simples',
+      'chart-bar': 'Gráfico de Linha',
+      'chart-line': 'Gráfico de Barras',
+      'chart-pizza': 'Métrica Simples',
       'table': 'Tabela de Dados',
       'top-products': 'Top Produtos'
     }
@@ -118,14 +119,14 @@ export default function Home() {
   const { data:ticketData, isLoading, error } = api.ticket.getAverageTicketByStoreAndDate.useQuery({
     startDate: startDate!,
     endDate: endDate!,
-    loja_id:loja
+    loja_id:loja_id!
   }, {
     enabled: !!startDate && !!endDate, // Só executa quando as datas estão definidas
   })
   const { data:produtos_complain, isLoading:isloading_produtos, error:error_produtos } = api.produtos_complain.getPrdutosComplain.useQuery({
     startDate: startDate!,
     endDate: endDate!,
-    loja_id:loja
+    loja_id:loja_id!
   }, {
     enabled: !!startDate && !!endDate, // Só executa quando as datas estão definidas
   })

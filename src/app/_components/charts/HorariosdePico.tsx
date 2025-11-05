@@ -4,6 +4,8 @@ import { Line } from 'react-chartjs-2'
 import { useFilter } from '~/app/context/filterContext'
 import React from 'react'
 import { api } from '~/trpc/react'
+import BorderBox from '../BorderBox'
+import CarregarChart from '../CarrgarChar'
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -65,12 +67,15 @@ export function HorariosdePico() {
     plugins: {
       legend: {
         position: 'top' as const,
-      },
+      },title: {
+        display: true,
+        text: `Horários Com mais Vendas ${startDate && endDate ? `(${formatarData(startDate)} à ${formatarData(endDate)})` : ''}${loja_id ? ` - Loja ${loja_id}` : ''}`,
+      }
     },
   }
 
-  if (isLoading) return <div>Carregando...</div>
-  if (error) return <div>Erro ao carregar dados</div>
-
-  return <Line data={data} options={options} />
+  return <BorderBox>
+    <CarregarChart loading={isLoading} error={error}></CarregarChart>
+    <Line  className='w-full' data={data} options={options} />
+  </BorderBox>
 }

@@ -1,9 +1,9 @@
 'use client'
 
 const draggableWidgets = [
-  { type: 'chart-line', label: '📈 Gráfico de Linha' },
-  { type: 'chart-bar', label: '📊 Gráfico de Barras' },
-  { type: 'metric', label: '🔢 Métrica Simples' },
+  { type: 'chart-bar', label: '📊 Gráfico de Coluna' },
+  { type: 'chart-line', label: '📈 Gráfico de Barras' },
+  { type: 'chart-pizza', label: '🍕 Pizza' },
   { type: 'table', label: '📋 Tabela de Dados' },
   { type: 'top-products', label: '🍕 Top Produtos' },
 ]

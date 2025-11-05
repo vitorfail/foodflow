@@ -15,7 +15,7 @@ type HeaderProps = {
   setCalendario: React.Dispatch<React.SetStateAction<boolean>>;
   lojas:LojasStore[]
 };
-export function Header({ calendario, setCalendario,lojas,Store,setLoja}: HeaderProps) {
+export function Header({ calendario, setCalendario,lojas}: HeaderProps) {
   //Context
   const { startDate, endDate, loja_id, setStartDate, setEndDate, setLojaId,formatarData } = useFilter()
   //Dias do calendário
@@ -208,7 +208,7 @@ export function Header({ calendario, setCalendario,lojas,Store,setLoja}: HeaderP
   }, []); 
   return (
     <header className="bg-white shadow-sm border-b relative">
-      <div className={`absolute w-fit h-fit top-18 py-1.5 px-3.5 bg-white shadow-lg right-3.5 ${calendario? "flex flex-col" :"hidden"}  justify-between align-middle`}>
+      <div className={`absolute w-fit h-fit top-18 z-10 py-1.5 px-3.5 bg-white shadow-lg right-3.5 ${calendario? "flex flex-col" :"hidden"}  justify-between align-middle`}>
         <div className="flex w-fit h-fit">
           <div className="w-fit h-fit ">
             <div className="bg-white rounded-lg shadow-md p-6 h-[380px] w-[350px]">
@@ -340,39 +340,40 @@ export function Header({ calendario, setCalendario,lojas,Store,setLoja}: HeaderP
           </div>
           
           <div className="flex items-center space-x-4">
+            <p className="p-2 bg-blue-100 rounded-xl font-medium">{startDate + " á "+ endDate}</p>
             <select onChange={(e) => ticektMedioChange(e)} className="border rounded-lg px-3 py-2 text-sm">
               <option value="7" >Últimos 7 dias</option>
               <option value="30">Últimos 30 dias</option>
               <option value="mes">Este mês</option>
               <option value="person">Personalizado</option>
             </select>
-<div className="relative">
-  <input
-    type="text"
-    placeholder="Pesquisar lojas..."
-    value={searchTerm}
-    onChange={(e) => setSearchTerm(e.target.value)}
-    className="border rounded-lg px-3 py-2 text-sm w-full"
-  />
-  
-  {/* Dropdown personalizado */}
-  {searchTerm && (
-    <div className="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-lg mt-1 max-h-60 overflow-y-auto z-10 shadow-lg">
-      {lojasFiltradas.map((item, index) => (
-        <div
-          key={index}
-          onClick={() => {
-            setLoja(item.store_id);
-            setSearchTerm(item.store_name); // Mostra o nome no input
-          }}
-          className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
-        >
-          {item.store_name}
-        </div>
-      ))}
-    </div>
-  )}
-</div>
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Pesquisar lojas..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="border rounded-lg px-3 py-2 text-sm w-full"
+              />
+              
+              {/* Dropdown personalizado */}
+              {searchTerm && (
+                <div className="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-lg mt-1 max-h-60 overflow-y-auto z-10 shadow-lg">
+                  {lojasFiltradas.map((item, index) => (
+                    <div
+                      key={index}
+                      onClick={() => {
+                        setLojaId(item.store_id);
+                        setSearchTerm(item.store_name); // Mostra o nome no input
+                      }}
+                      className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                    >
+                      {item.store_name}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
             <button className="bg-orange-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-orange-600 transition-colors">
               + Novo Dashboard

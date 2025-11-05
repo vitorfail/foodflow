@@ -3,6 +3,8 @@
 import { Bar } from 'react-chartjs-2'
 import { useFilter } from '~/app/context/filterContext'
 import { api } from '~/trpc/react'
+import BorderBox from '../BorderBox'
+import CarregarChart from '../CarrgarChar'
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -146,12 +148,11 @@ export function GraficoColunas() {
     },
   };
 
-  if (isLoading) return <div>Carregando...</div>
-  if (error) return <div>Erro ao carregar dados: {error.message}</div>
 
   return (
-    <div style={{ width: '100%', height: '400px' }}> {/* Container com altura fixa */}
+    <BorderBox>
+      <CarregarChart loading={isLoading} error={error}></CarregarChart>
       <Bar data={channelData} options={options} />
-    </div>
+    </BorderBox>
   )
 }
