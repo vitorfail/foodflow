@@ -4,12 +4,12 @@ Como base no que foi requisitado eu eu optei por fazer um MVP. E tendo em vista 
 ---
 
 # 😵‍💫Sobre o Problema
-De fato muitos empreendedores tem uma demanda cruscial na questão de vizualização de dados, tenho noção disso pois já trabalhei no setor de estoque de uma grande empresa de varejo da minha região e era um caos(kkkkk). O Fato é que um grando problema que eles enfrentão é a vizualização mais clara para tomada de decisões.
+De fato muitos empreendedores tem uma demanda cruscial na questão de vizualização de dados, tenho noção disso pois já trabalhei no setor de estoque de uma grande empresa de varejo da minha região e era um caos(kkkkk). O Fato é que um grade problema que eles enfrentam é a vizualização mais clara para tomada de decisões.
 
 ---
 
 # ✨ Inspiração
-Com base nesse problema eu me inpirei em um ferramente tão simples que qualquer pessoa consegue usar já nno primeiro contato: o `dashgo`. O intuito dela é fazer com que você "crafte" os widgets que você vai querer. Me baseei nisso para colocar a feature de arrastar e solvar o kpis e graficos que o gestor desejar.  
+Com base nesse problema eu me inpirei em um ferramente tão simples que qualquer pessoa consegue usar já no primeiro contato: o `dashgo`. O intuito dela é fazer com que você "crafte" os widgets que você vai querer. Me baseei nisso para colocar a feature de arrastar e solvar o kpis e graficos que o gestor desejar.  
 
 ---
 
@@ -34,10 +34,10 @@ Deploy: Render
 ⏳ Futuras melhorias: Filtros e seleção de dados nos widgets
 
 # 🗃️ Banco de Dados
-Devido ao fato do banco de dados tem em torno de 758mb eu tive que procurar bem para achar um DB com uma licença free para suportar ele para o deploy web. Por isso optei eplo render.
+Devido ao fato do banco de dados ter em torno de 758mb eu tive que procurar bem para achar um DB com uma licença free para suportar ele para o deploy web. Por isso optei pelo render.
 
 # 🔧 Configuração
-No email onde mandei o link desse portifólio também mandei o arquivo .env. É só olocar ele na raiz do projeto. 
+No email onde mandei o link desse portifólio também mandei o arquivo .env. É só colocar ele na raiz do projeto. 
 
 # 🚧 Limitações e Próximos Passos
 ⚠️ Performance limitada devido a restrições da versão free do Render
